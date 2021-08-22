@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10) 
 project(modern)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++-10")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++-12")
 
 # setting paths for libraries and executable outputs
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
