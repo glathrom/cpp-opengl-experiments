@@ -1,0 +1,1 @@
+/usr/bin/clang++-10 -O3 -DNDEBUG -Wl,-rpath,/usr/lib64 CMakeFiles/application.dir/src/application.cpp.o -o bin/application  /usr/lib/x86_64-linux-gnu/libglfw.so /usr/lib64/libGLEW.so -lGL 

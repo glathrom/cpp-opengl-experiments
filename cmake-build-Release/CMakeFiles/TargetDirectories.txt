@@ -1,0 +1,3 @@
+/home/grant/Projects/opengl/modern/cmake-build-Release/CMakeFiles/rebuild_cache.dir
+/home/grant/Projects/opengl/modern/cmake-build-Release/CMakeFiles/edit_cache.dir
+/home/grant/Projects/opengl/modern/cmake-build-Release/CMakeFiles/application.dir
