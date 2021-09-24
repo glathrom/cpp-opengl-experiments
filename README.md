@@ -1,1 +1,1 @@
-# cpp-opegl-experiments
+# C++ OpenGL Experiments
