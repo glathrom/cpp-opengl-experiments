@@ -32,7 +32,10 @@ set(LIBS ${LIBS} ${GLEW_LIBRARIES})
 add_library(shader STATIC shader.cpp)
 target_link_libraries(shader ${GLEW_LIBRARIES} -lGL)
 
-add_executable(lesson lesson.cpp ${shader})
-target_link_libraries(lesson ${GLFW_LIB} ${GLEW_LIBRARIES} -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl shader)
+add_library(vbo STATIC vbo.cpp)
+target_link_libraries(vbo ${GLEW_LIBRARIES} -lGL)
+
+add_executable(lesson lesson.cpp ${shader} ${vbo})
+target_link_libraries(lesson ${GLFW_LIB} ${GLEW_LIBRARIES} -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl shader vbo)
 target_link_options(lesson PUBLIC "LINKER:-rpath,/usr/lib64")
 

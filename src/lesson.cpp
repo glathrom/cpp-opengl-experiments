@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "shader.h"
+#include "vbo.h"
 
 #define GLEW_STATIC
 
@@ -69,22 +70,25 @@ int main(){
     // create an index for the vertex array buffer
     // the vertex buffer object and the index 
     // array buffer
-    GLuint VAO, VBO, IAO;
+    GLuint VAO, IAO;
     
     
     // generate the vertex array buffer
     glGenVertexArrays(1, &VAO);
-    
+
+ 
     // generate the vertex buffer object
-    glGenBuffers(1, &VBO);
+    // glGenBuffers(1, &VBO);
+    VBO vbo(vertices, sizeof(vertices));
     glGenBuffers(1, &IAO);
 
     glBindVertexArray(VAO);
     
     // bind the buffer and describe its type
     // map the data into the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    vbo.Bind();
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IAO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -114,7 +118,7 @@ int main(){
     }
 
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    vbo.Delete();
     shader.Delete();
 
     glfwTerminate();
