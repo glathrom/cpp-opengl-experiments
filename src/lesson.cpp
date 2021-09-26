@@ -1,25 +1,50 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "shader.h"
-#include "vbo.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "shader.hpp"
+#include "vbo.hpp"
+#include "iao.hpp"
+#include "vao.hpp"
 
 #define GLEW_STATIC
 
-const char* APP_TITLE = "Introduction to OpenGL - Hello Window 2";
-const int WindowWidth = 800;
-const int WindowHeight = 600;
+const char* APP_TITLE = "Introduction to OpenGL - Hello Window 4";
 
 void processInput(GLFWwindow *window){
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
 
+
 const char* vertexFile = "../res/shaders/default.vert";
 const char* fragFile = "../res/shaders/default.frag";
 
-int main(){
+const unsigned int width = 800;
+const unsigned int height = 600;
 
+GLfloat  vertices[] = {
+    //    coordinates     /     colors
+    -0.50f, -0.50f, 0.00f, 0.8f, 0.30f, 0.02f,
+     0.00f, -0.50f, 0.00f, 0.8f, 0.30f, 0.02f,
+    -0.25f,  0.00f, 0.00f, 1.0f, 0.60f, 0.32f,
+     0.25f,  0.00f, 0.00f, 0.9f, 0.45f, 0.17f,
+     0.00f,  0.50f, 0.00f, 0.9f, 0.45f, 0.17f,
+     0.50f, -0.50f, 0.00f, 0.8f, 0.30f, 0.02f,
+};
+
+GLuint indices[] = {
+    0, 1, 2,
+    2, 4, 3,
+    3, 5, 1
+};
+
+
+int main(){
+    
     if( !glfwInit() ){
         std::cerr << "GLFW initialization failed" << std::endl;
         return EXIT_FAILURE;
@@ -30,7 +55,7 @@ int main(){
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
-    GLFWwindow *window = glfwCreateWindow(WindowWidth, WindowHeight, APP_TITLE, NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(width, height, APP_TITLE, NULL, NULL);
     if( window == NULL ){
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -46,56 +71,34 @@ int main(){
         return EXIT_FAILURE;
     }
 
-    glViewport(0,0,800,800);
-    
+    glViewport(0,0,width,height);
+
     // shader information 
     Shader shader(vertexFile, fragFile); 
-    
-    
-    GLfloat  vertices[] = {
-        -0.50f, -0.50f, 0.00f,
-         0.00f, -0.50f, 0.00f,
-        -0.25f,  0.00f, 0.00f,
-         0.25f,  0.00f, 0.00f,
-         0.00f,  0.50f, 0.00f,
-         0.50f, -0.50f, 0.00f,
-    };
+    shader.Bind();
 
-    GLuint indices[] = {
-        0, 1, 2,
-        2, 4, 3,
-        3, 5, 1
-    };
+    // setting up shader uniform
+    GLfloat r = 0.0f;
+    GLfloat increment = 0.05f;
 
     // create an index for the vertex array buffer
-    // the vertex buffer object and the index 
-    // array buffer
-    GLuint VAO, IAO;
-    
-    
-    // generate the vertex array buffer
-    glGenVertexArrays(1, &VAO);
+    VAO vao;
+    vao.Bind();
 
- 
-    // generate the vertex buffer object
-    // glGenBuffers(1, &VBO);
+    // generate the vertex buffer object 
+    // and index array objects
     VBO vbo(vertices, sizeof(vertices));
-    glGenBuffers(1, &IAO);
+    IAO iao(indices, sizeof(indices));
 
-    glBindVertexArray(VAO);
+    // link attribute for the vertex
+    vao.LinkAttrib(vbo,0, 3, GL_FLOAT, 6*sizeof(GL_FLOAT), (void*)0);
+
+    // link attribute for the colors
+    vao.LinkAttrib(vbo,1, 3, GL_FLOAT, 6*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
+
+    vao.Unbind();
+    iao.Unbind();
     
-    // bind the buffer and describe its type
-    // map the data into the buffer
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    vbo.Bind();
-    
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IAO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(0);
 
     while( !glfwWindowShouldClose(window) ){
         // polls for mouse events
@@ -106,20 +109,28 @@ int main(){
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         //glUseProgram(shaderProgram);
-        shader.Activate();
+        shader.Bind();
+        shader.SetUniform4f("u_Color", r, 0.2f, 0.9f, 1.0f);
         
-        
-        glBindVertexArray(VAO);
+        vao.Bind();
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+
+        if( r > 1.0f ){
+            increment = -0.05f;
+        } else if (r < 0.0f){
+            increment = 0.05f;
+        }
+        r += increment;
 
         // double buffering for front buffer (currently shown)
         // and back buffer (current being drawn upon)
         glfwSwapBuffers(window);
     }
 
-    glDeleteVertexArrays(1, &VAO);
     vbo.Delete();
+    iao.Delete();
     shader.Delete();
+    vao.Delete();
 
     glfwTerminate();
 

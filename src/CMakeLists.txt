@@ -35,7 +35,13 @@ target_link_libraries(shader ${GLEW_LIBRARIES} -lGL)
 add_library(vbo STATIC vbo.cpp)
 target_link_libraries(vbo ${GLEW_LIBRARIES} -lGL)
 
-add_executable(lesson lesson.cpp ${shader} ${vbo})
-target_link_libraries(lesson ${GLFW_LIB} ${GLEW_LIBRARIES} -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl shader vbo)
+add_library(iao STATIC iao.cpp)
+target_link_libraries(iao ${GLEW_LIBRARIES} -lGL)
+
+add_library(vao STATIC vao.cpp)
+target_link_libraries(vao ${GLEW_LIBRARIES} -lGL)
+
+add_executable(lesson lesson.cpp ${shader} ${vbo} ${iao} ${vao})
+target_link_libraries(lesson ${GLFW_LIB} ${GLEW_LIBRARIES} -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl shader vbo iao vao)
 target_link_options(lesson PUBLIC "LINKER:-rpath,/usr/lib64")
 
